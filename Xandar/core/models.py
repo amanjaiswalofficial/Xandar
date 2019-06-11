@@ -240,3 +240,15 @@ class Coupons(models.Model):
 
     def __str__(self):
         return self.name
+
+# class Coupons(models.Model):
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+class Color(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    color = models.CharField(max_length=10)
+
+
+class ColorDefinition(models.Model):
+    color = models.CharField(max_length=10)
+    code = models.CharField(max_length=8)

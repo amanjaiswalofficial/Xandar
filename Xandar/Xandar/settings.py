@@ -76,6 +76,8 @@ TEMPLATES = [
                 'operations.context_processors.cart_count',
                 'operations.context_processors.categories',
                 'operations.context_processors.price',
+                'operations.context_processors.brand',
+                'operations.context_processors.sub_category',
             ],
         },
     },
