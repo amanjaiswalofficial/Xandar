@@ -7,6 +7,7 @@ from django.views.generic import DetailView
 #from operations.cart import add_cart
 from operations.views import add_wishlist_item
 from django.http import HttpResponse
+from django.contrib import messages
 from core.models import Wishlist
 from core.get_data import *
 
@@ -60,6 +61,7 @@ class ProductListView(ListView):
 		context['values'] = self.request.GET
 		context['categories'] = CATEGORY_CHOICES
 		context['sub_categories'] = SUB_CATEGORY_CHOICES
+		context['no_category'] = True
 
 		for object in context['object_list']:
 			print(object)
@@ -107,3 +109,61 @@ def product_add_wishlist_cart(request, pk):
 		return HttpResponse(add_wishlist_item(request, pk))
 	else:
 		return HttpResponse(add_to_cart(request, pk, quantity))
+
+
+def filter_by(request, category='All', price=0, brand='None', color='None', sub='None'):
+	print(sub)
+	tags = []
+	filter = {}
+	print('Category: ' + str(category))
+	print('Price: ' + str(price))
+	print('Brand: ' + str(brand))
+	print('Color: ' + str(color))
+	if price:
+		tags.append(price)
+		filter['price__gte'] = price
+	if sub:
+
+		try:
+			filter['sub_category'] = ProductSubcategory.objects.get(sub_category=sub).id
+			tags.append(sub)
+		except ProductSubcategory.DoesNotExist:
+			pass
+	# current_category = ProductCategory.objects.get(category=category)
+	#     product_filter = current_category.product_set.all()
+	current_category = ProductCategory.objects.get(category=category)
+	# product_filter = list(current_category.product_set.filter(**filter))
+	product_filter = set(current_category.product_set.filter(**filter))
+	if color:
+		tags.append(color)
+		products_of_color = []
+		for item in Color.objects.filter(color=color):
+			products_of_color.append(item.product)
+		# for product in product_filter:
+		#  if product not in products_of_color:
+		#     product_filter.remove(product)
+		product_filter = product_filter.intersection(set(products_of_color))
+	if brand:
+		tags.append(brand)
+		products_of_brand = []
+		for item in Attribute.objects.filter(attribute='Brand', value=brand):
+			products_of_brand.append(item.product)
+		# product_filter = [value for value in product_filter if value in products_of_brand]
+		product_filter = product_filter.intersection(set(products_of_brand))
+	no_category = False
+	if current_category:
+		request.session["category"] = current_category.category
+	if sub:
+		request.session["sub_category"] = sub
+
+	return render(request, "products/product_list.html",
+				  {'filtered_item': product_filter, 'no_category': no_category, 'tags': tags})
+
+
+
+
+
+
+
+
+

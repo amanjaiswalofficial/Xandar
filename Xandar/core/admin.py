@@ -2,6 +2,12 @@ from django.contrib import admin
 from core.models import *
 from django.contrib.auth.admin import UserAdmin
 
+class ColorAdmin(admin.StackedInline):
+    model = Color
+    initial_num = 1
+
+    def get_extra(self, request, obj=None, **kwargs):
+        return self.initial_num
 
 class ProductImageInline(admin.StackedInline):
     model = ProductImage
@@ -29,7 +35,7 @@ class ProductAdmin(admin.ModelAdmin):
     # list_filter = ('category','sub_category','gender')
     exclude = ('slug',)
     inlines = [
-        ProductImageInline, AttributeInline
+        ProductImageInline, AttributeInline, ColorAdmin
     ]
 
 
@@ -57,3 +63,5 @@ admin.site.register(WishlistItems)
 admin.site.register(ProductSubcategory, SubCategoryAdmin)
     
 admin.site.register(Coupons)
+admin.site.register(Color)
+admin.site.register(ColorDefinition)
