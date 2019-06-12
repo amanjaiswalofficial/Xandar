@@ -57,16 +57,17 @@ aria-expanded="false">{{user.first_name }}</a>
 </div>
 <div class="search_input" id="search_input_box">
 <div class="container">
-<form class="d-flex justify-content-between"  method="GET" action="{% url 'product_list' %}">
+<form class="d-flex justify-content-between"  method="GET" id='form-search'>
 
 
 
 <div class="col-md-2 mt-2">
-<select name="category" class="form-control text-dark">
-                  <option selected="true" disabled="disabled">Categories (All)</option>
-                  <option>Clothing</option>
-                  <option>Lifestyle</option>
-                  <option>Electronics</option>
+<select name="category" class="form-control text-dark" id="myselect">
+                  <option selected="true">All</option>
+                  {%  for object in product_categories %}
+                  <option>{{ object.category }}</option>
+                  
+                  {% endfor %}
                 </select>
 </div>
 
@@ -77,4 +78,18 @@ aria-expanded="false">{{user.first_name }}</a>
 </div>
 </div>
 </header>
+<script
+			  src="https://code.jquery.com/jquery-3.4.1.min.js"
+			  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			  crossorigin="anonymous"></script>
+<script type>
+	
+	$('#form-search').submit(function(event)
+	{
+		event.preventDefault()
+		category = $( "#myselect option:selected" ).text()
+		text = $("#search_input").val()
+		window.location.href = '/product/category='+category+'&&text='+text
+	})
+</script>
 <!-- End Header Area -->

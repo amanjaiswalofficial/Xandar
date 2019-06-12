@@ -28,4 +28,6 @@ def count_sub_category(sub_category):
 
 @register.filter
 def count_objs(objects):
-    return len(objects)
+    if objects:
+        return len(objects)
+    return 0
