@@ -111,22 +111,26 @@ def product_add_wishlist_cart(request, pk):
 		return HttpResponse(add_to_cart(request, pk, quantity))
 
 
-def filter_by(request, category='All', price=0, brand='None', color='None',sub='None'):
+def filter_by(request, category='All', price=0, brand='None', color='None', sub='None'):
 	print(sub)
-	tags=[]
-	filter={}
-	print('Category: '+str(category))
-	print('Price: '+str(price))
-	print('Brand: '+str(brand))
-	print('Color: '+str(color))
+	tags = []
+	filter = {}
+	print('Category: ' + str(category))
+	print('Price: ' + str(price))
+	print('Brand: ' + str(brand))
+	print('Color: ' + str(color))
 	if price:
 		tags.append(price)
-		filter['price__gte']=price
+		filter['price__gte'] = price
 	if sub:
-		tags.append(sub)
-		filter['sub_category']=ProductSubcategory.objects.get(sub_category = sub).id
-	#current_category = ProductCategory.objects.get(category=category)
-	# 		product_filter = current_category.product_set.all()
+
+		try:
+			filter['sub_category'] = ProductSubcategory.objects.get(sub_category=sub).id
+			tags.append(sub)
+		except ProductSubcategory.DoesNotExist:
+			pass
+	# current_category = ProductCategory.objects.get(category=category)
+	#     product_filter = current_category.product_set.all()
 	current_category = ProductCategory.objects.get(category=category)
 	# product_filter = list(current_category.product_set.filter(**filter))
 	product_filter = set(current_category.product_set.filter(**filter))
@@ -136,8 +140,8 @@ def filter_by(request, category='All', price=0, brand='None', color='None',sub='
 		for item in Color.objects.filter(color=color):
 			products_of_color.append(item.product)
 		# for product in product_filter:
-		# 	if product not in products_of_color:
-		# 		product_filter.remove(product)
+		#  if product not in products_of_color:
+		#     product_filter.remove(product)
 		product_filter = product_filter.intersection(set(products_of_color))
 	if brand:
 		tags.append(brand)
@@ -149,8 +153,16 @@ def filter_by(request, category='All', price=0, brand='None', color='None',sub='
 	no_category = False
 	if current_category:
 		request.session["category"] = current_category.category
+	if sub:
+		request.session["sub_category"] = sub
 
-	return render(request, "products/product_list.html", {'filtered_item': product_filter, 'no_category': no_category,'tags':tags})
+	return render(request, "products/product_list.html",
+				  {'filtered_item': product_filter, 'no_category': no_category, 'tags': tags})
+
+
+
+
+
 
 
 
