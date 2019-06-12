@@ -79,6 +79,8 @@ TEMPLATES = [
                 'operations.context_processors.brand',
                 'operations.context_processors.sub_category',
                 'operations.context_processors.filter_attributes',
+                'core.context_navbar.navbar_context',
+                
             ],
         },
     },

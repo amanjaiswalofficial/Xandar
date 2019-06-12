@@ -25,7 +25,7 @@ class ProductListView(ListView):
 
 		qs = Product.objects.all()
 		query = self.request.GET.get("name", None)
-		query2 = self.request.GET.get("product_category", None)
+		query2 = self.request.GET.get("category", None)
 		query3 = self.request.GET.get("sub_category", None)
 		query4 = self.request.GET.get("price", None)
 		# query5 = self.request.GET.get("description", None)
@@ -37,12 +37,12 @@ class ProductListView(ListView):
 
 		if query2 is not None:
 			qs = qs.filter(
-				Q(product_category__category__iexact=query2)
+				Q(category__category__iexact=query2)
 			)
 
 		if query3 is not None:
 			qs = qs.filter(
-				Q(product_category__sub_category__iexact=query3)
+				Q(sub_category__sub_category__iexact=query3)
 			)
 
 		if query4 is not None:
@@ -111,59 +111,71 @@ def product_add_wishlist_cart(request, pk):
 		return HttpResponse(add_to_cart(request, pk, quantity))
 
 
-def filter_by(request, category='All', price=0, brand='None', color='None', sub='None'):
-	print(sub)
-	tags = []
-	filter = {}
-	print('Category: ' + str(category))
-	print('Price: ' + str(price))
-	print('Brand: ' + str(brand))
-	print('Color: ' + str(color))
-	if price:
-		tags.append(price)
-		filter['price__gte'] = price
-	if sub:
+def filter_by(request, category='All', price=0, brand='None', color='None', sub='None', text=''):
+   print(sub)
+   tags = []
+   filter = {}
+   print('Category: ' + str(category))
+   print('Price: ' + str(price))
+   print('Brand: ' + str(brand))
+   print('Color: ' + str(color))
+   print(text)
+   if price:
+      tags.append(price)
+      filter['price__gte'] = price
+   if sub:
 
-		try:
-			filter['sub_category'] = ProductSubcategory.objects.get(sub_category=sub).id
-			tags.append(sub)
-		except ProductSubcategory.DoesNotExist:
-			pass
-	# current_category = ProductCategory.objects.get(category=category)
-	#     product_filter = current_category.product_set.all()
-	current_category = ProductCategory.objects.get(category=category)
-	# product_filter = list(current_category.product_set.filter(**filter))
-	product_filter = set(current_category.product_set.filter(**filter))
-	if color:
-		tags.append(color)
-		products_of_color = []
-		for item in Color.objects.filter(color=color):
-			products_of_color.append(item.product)
-		# for product in product_filter:
-		#  if product not in products_of_color:
-		#     product_filter.remove(product)
-		product_filter = product_filter.intersection(set(products_of_color))
-	if brand:
-		tags.append(brand)
-		products_of_brand = []
-		for item in Attribute.objects.filter(attribute='Brand', value=brand):
-			products_of_brand.append(item.product)
-		# product_filter = [value for value in product_filter if value in products_of_brand]
-		product_filter = product_filter.intersection(set(products_of_brand))
-	no_category = False
-	if current_category:
-		request.session["category"] = current_category.category
-	if sub:
-		request.session["sub_category"] = sub
+      try:
+         filter['sub_category'] = ProductSubcategory.objects.get(sub_category=sub).id
+         tags.append(sub)
+      except ProductSubcategory.DoesNotExist:
+         pass
+   # current_category = ProductCategory.objects.get(category=category)
+   #     product_filter = current_category.product_set.all()
+   if category == 'All':
+   	current_category = ''
+   	product_filter = set(Product.objects.all())
+   else:
+   	current_category = ProductCategory.objects.get(category=category)
+   	product_filter = set(current_category.product_set.filter(**filter))
+   print(current_category)
 
-	return render(request, "products/product_list.html",
-				  {'filtered_item': product_filter, 'no_category': no_category, 'tags': tags})
+   # product_filter = list(current_category.product_set.filter(**filter))
+   if color:
+      tags.append(color)
+      products_of_color = []
+      for item in Color.objects.filter(color=color):
+         products_of_color.append(item.product)
+      # for product in product_filter:
+      #  if product not in products_of_color:
+      #     product_filter.remove(product)
+      product_filter = product_filter.intersection(set(products_of_color))
+   if brand:
+      tags.append(brand)
+      products_of_brand = []
+      for item in Attribute.objects.filter(attribute='Brand', value=brand):
+         products_of_brand.append(item.product)
+      # product_filter = [value for value in product_filter if value in products_of_brand]
+      product_filter = product_filter.intersection(set(products_of_brand))
+   no_category = False
+   if current_category == '':
+   	  request.session["category"] = 'All'
+   else:
+      request.session["category"] = current_category.category
+   if sub:
+      request.session["sub_category"] = sub
+   if text:
+      search_by_text = set(Product.objects.filter(name__icontains=text))
+      product_filter = product_filter.intersection(search_by_text)
+
+   return render(request, "products/product_list.html",
+              {'filtered_item': product_filter, 'no_category': no_category, 'tags': tags})
 
 
-
-
-
-
-
-
-
+def search_result(request):
+   text = request.GET.get('name', None)
+   category = request.GET.get('category',None)
+   if text:
+      return filter_by(request, text=text, category=category, price=None, brand=None, color=None)
+   else:
+   	return filter_by(request, category=category)

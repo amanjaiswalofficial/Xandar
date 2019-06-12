@@ -22,8 +22,11 @@ def sub_category(request):
     category = request.session.get("category", None)
     sub_categories = None
     if category:
-        category = ProductCategory.objects.get(category=category)
-        sub_categories = category.productsubcategory_set.all()
+        try:
+            category = ProductCategory.objects.get(category=category)
+            sub_categories = category.productsubcategory_set.all()
+        except ProductCategory.DoesNotExist:
+            sub_category = []
     return {"sub_category": sub_categories}
 
 def price(request):
