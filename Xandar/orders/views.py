@@ -1,11 +1,17 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, render_to_response
 
 from core.get_data import get_data
 from core.models import OrderedItems, DeliveryAddresses, Customer, Wishlist, Cart, CartItems, ProductImage, Product, \
     Review
-from django.views.generic import ListView
+from django.views.generic import ListView, UpdateView
+
+from orders.forms import UpdateAddress
 from products.views import ProductDetailView
+from datetime import datetime
+from core.models import Coupons
 # Create your views here.
 
 
@@ -132,3 +138,47 @@ def post_review(request, pk):
     customer_full_name = customer.first_name + " " + customer.last_name
     Review.objects.create(customer_name=customer_full_name, product=product, message=message)
     return HttpResponse('Response Posted Successfully')
+
+
+def apply_coupon(request):
+    coupon_name = request.GET.get('coupon', None)
+
+    if coupon_name:
+        try:
+            coupon = Coupons.objects.get(name=coupon_name)
+            valid_till = coupon.valid_till
+
+            remainder = int(datetime.now().day - valid_till.day)
+
+            if remainder > 0:
+                return HttpResponse("Coupon Expired")
+
+            discount_percentage = coupon.discount % 100
+            total = int(request.GET['total'])
+
+            total = total - discount_percentage
+            return HttpResponse(total)
+
+        except Coupons.DoesNotExist:
+            return HttpResponse("Invalid Coupon No Discount")
+    else:
+        return HttpResponse("Provide a valid Coupon Name")
+
+@login_required
+def delete_address(request, pk):
+    DeliveryAddresses.objects.get(id=pk).delete()
+    return redirect('orders:delivery_address')
+
+class UpdateAddress(LoginRequiredMixin, UpdateView):
+    model = DeliveryAddresses
+    template_name = 'orders/update_address.html'
+    context_object_name = 'details'
+    form_class = UpdateAddress
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('orders:delivery_address')
+
+
+
+
