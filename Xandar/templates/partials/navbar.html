@@ -21,9 +21,7 @@ aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle 
 <li class="nav-item active"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
 
 
-<li class="nav-item">
-<a class="nav-link" href="{% url 'product_list' %}">Shop</a>
-</li>
+
 {% if user.is_authenticated %}
 
 <li class="nav-item submenu dropdown active">

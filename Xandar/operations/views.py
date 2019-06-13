@@ -215,10 +215,14 @@ def get_cart(request):
             errors = "You don't have anything in cart"
             return render(
                 request, 'operations/cart.html', {'errors': errors})
-
+        count=0
         for item in request.session[settings.CART_SESSION_ID].values():
+            count+=1
             # item['price'] = Decimal(item['price'])
             item['total_price'] = item['unit_price'] * item['quantity']
+            item['id']=count
+            item['product']['price'] = item['unit_price']
+            print(item)
             items.append(item)
 
         total_price = sum(Decimal(item['unit_price']) * item['quantity'] for item in
@@ -276,13 +280,23 @@ def update_cart(request, product_id):
         # import pdb;
         # pdb.set_trace()
         #html = render(request, 'operations/cart.html')
-        cart = Cart.objects.get(user=request.user, is_ordered=False)
-        items = CartItems.objects.filter(cart=cart,product=product)[0]
-        output = json.dumps({
-         'message':message,
-         'item_id': items.id,
-         'item_quantity':items.quantity,
-        })
+        if request.user.is_authenticated:
+            cart = Cart.objects.get(user=request.user, is_ordered=False)
+            items = CartItems.objects.filter(cart=cart, product=product)[0]
+            output = json.dumps({
+                'message': message,
+                'item_id': items.id,
+                'item_quantity': items.quantity,
+            })
+        else:
+            for item in request.session[settings.CART_SESSION_ID].values():
+                if item['product']['id'] == product_id:
+                    id = item['id']
+            output = json.dumps({
+                'message': message,
+                'item_id': id,
+                'item_quantity': request.session[settings.CART_SESSION_ID][product_id]['quantity'],
+            })
         return HttpResponse(output,content_type="application/json")
         #return HttpResponse(output, content_type='application/json')
 
