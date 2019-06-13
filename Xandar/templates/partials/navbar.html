@@ -4,7 +4,7 @@
 <nav class="navbar navbar-expand-lg navbar-light main_box">
 <div class="container">
 <!-- Brand and toggle get grouped for better mobile display -->
-<a class="navbar-brand logo_h" href="{% url 'index' %}"><img src="{% static 'img/logo.png' %}"></a>
+<a class="navbar-brand logo_h" href="{% url 'index' %}"><img src="{% static 'img/logo.jpg' %}"></a>
 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 <span class="icon-bar"></span>
@@ -21,9 +21,7 @@ aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle 
 <li class="nav-item active"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
 
 
-<li class="nav-item">
-<a class="nav-link" href="{% url 'product_list' %}">Shop</a>
-</li>
+
 {% if user.is_authenticated %}
 
 <li class="nav-item submenu dropdown active">
@@ -57,16 +55,17 @@ aria-expanded="false">{{user.first_name }}</a>
 </div>
 <div class="search_input" id="search_input_box">
 <div class="container">
-<form class="d-flex justify-content-between"  method="GET" action="{% url 'product_list' %}">
+<form class="d-flex justify-content-between"  method="GET" id='form-search'>
 
 
 
 <div class="col-md-2 mt-2">
-<select name="category" class="form-control text-dark">
-                  <option selected="true" disabled="disabled">Categories (All)</option>
-                  <option>Clothing</option>
-                  <option>Lifestyle</option>
-                  <option>Electronics</option>
+<select name="category" class="form-control text-dark" id="myselect">
+                  <option selected="true">All</option>
+                  {%  for object in product_categories %}
+                  <option>{{ object.category }}</option>
+                  
+                  {% endfor %}
                 </select>
 </div>
 
@@ -77,4 +76,18 @@ aria-expanded="false">{{user.first_name }}</a>
 </div>
 </div>
 </header>
+<script
+			  src="https://code.jquery.com/jquery-3.4.1.min.js"
+			  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			  crossorigin="anonymous"></script>
+<script type>
+	
+	$('#form-search').submit(function(event)
+	{
+		event.preventDefault()
+		category = $( "#myselect option:selected" ).text()
+		text = $("#search_input").val()
+		window.location.href = '/product/category='+category+'&&text='+text
+	})
+</script>
 <!-- End Header Area -->

@@ -30,14 +30,26 @@
 				<div class="col-lg-6">
 					<div>
                         <div class="single-prd-item">
-                                        <img class="img-fluid" src="{{images.0.image.url}}">
+                                        <img class="img-fluid" src="{{images.0.image.url}}" style="position: relative;
+                                             width:  800px;
+                                             height: 400px;
+                                             background-position: 80% 80%;
+                                             background-repeat: no-repeat;
+                                             background-size: cover;
+                                             object-fit: contain;">
 							<br><br>
                             <div class="row mb-5 thumbs">
 
                             {% for image in images %}
                                 <div class="col-md-2">
                                       <a href="{{ image.image.url }}" data-lightbox="home-images">
-                                        <img class="img-fluid"  src="{{ image.image.url }}">
+                                        <img class="img-fluid"  src="{{ image.image.url }}" style="position: relative;
+                                            width:  300px;
+                                            height: 200px;
+                                            background-position: 80% 80%;
+                                            background-repeat: no-repeat;
+                                            background-size: cover;
+                                            object-fit: contain;">
                                       </a>
                                 </div>
                             {% endfor %}

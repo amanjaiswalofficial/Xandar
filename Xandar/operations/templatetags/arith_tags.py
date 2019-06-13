@@ -28,4 +28,10 @@ def count_sub_category(sub_category):
 
 @register.filter
 def count_objs(objects):
-    return len(objects)
+    if objects:
+        return len(objects)
+    return 0
+
+# @register.tag
+# def trim(name):
+#     return name.split(" ")[0]
