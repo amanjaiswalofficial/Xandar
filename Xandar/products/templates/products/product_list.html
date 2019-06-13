@@ -38,10 +38,10 @@
         <li class="main-nav-list"><a data-toggle="collapse" href="#meatFish" aria-expanded="false" aria-controls="meatFish"><span
 class="lnr lnr-arrow-right"></span>By Price<span class="number">({{product_count}})</span></a>
 <ul class="collapse" id="meatFish" data-toggle="collapse" aria-expanded="false" aria-controls="meatFish">
-<li class="main-nav-list child"><a onclick="call_url(500)">Price > 500</a></li>
-<li class="main-nav-list child"><a onclick="call_url(1000)">Price > 1000</a></li>
-<li class="main-nav-list child"><a onclick="call_url(2000)">1000 &lt Price < 2000</a></li>
-<li class="main-nav-list child"><a href="/product/filter/?pricegreat=2000">2000 > Price</a></li>
+<li class="main-nav-list child"><a onclick="call_url_price_both('price_lte','price_gte',500,'None')">Price > 500</a></li>
+<li class="main-nav-list child"><a onclick="call_url_price_both('price_lte','price_gte',500,1000)">500 < Price < 1000</a></li>
+<li class="main-nav-list child"><a onclick="call_url_price_both('price_lte','price_gte',1000,2000)">1000 < Price < 2000</a></li>
+    <li class="main-nav-list child"><a onclick="call_url_price_both('price_lte','price_gte',2000,3000)">2000 < Price < 3000</a></li>
     {% endif %}
 </ul>
 </li>
@@ -53,21 +53,25 @@ class="lnr lnr-arrow-right"></span>By Price<span class="number">({{product_count
 <div class="common-filter">
 <div class="head">Brands</div>
 <form action="#">
-<ul>
+<ul style="overflow-y: scroll;overflow-x: hidden">
+    <div style="width:200px;height:200px">
     {% for brand in attributes %}
+
         <li class="filter-list" onclick="call_url_general('brand','{{brand}}')"><input class="pixel-radio" type="button" id="{{brand}}" name="brand"><label for="{{brand}}">{{brand}}</label></li>
     {% empty %}
             <li class="filter-list"><input class="pixel-radio" type="button" name="brand"><label for="">No Brands Available</label></li>
     {% endfor %}
+            </div>
 </ul>
 </form>
 </div>
 <div class="common-filter">
 <div class="head">Color</div>
 <form action="#">
-<ul>
+<ul style="overflow-y: scroll;overflow-x: hidden">
+    <div style="width:200px;height:200px">
     {% for color in colors %}
-<li class="filter-list"><input class="pixel-radio" type="radio" id="{{color}}" name="color"><label for="{{color}}">{{color}}</label></li>
+<li class="filter-list" onclick="call_url_general('color','{{color}}')"><input class="pixel-radio" type="radio" id="{{color}}" name="color"><label for="{{color}}">{{color}}</label></li>
 <!--<li class="filter-list"><input class="pixel-radio" type="radio" id="balckleather" name="color"><label for="balckleather">Black-->
 <!--Leather<span>(29)</span></label></li>-->
 <!--<li class="filter-list"><input class="pixel-radio" type="radio" id="blackred" name="color"><label for="blackred">Black-->
@@ -77,6 +81,7 @@ class="lnr lnr-arrow-right"></span>By Price<span class="number">({{product_count
     {% empty %}
 <li class="filter-list"><input class="pixel-radio" type="radio"  name="color"><label for="">No Color Available</label></li>
     {% endfor %}
+    </div>
 </ul>
 </form>
 </div>
@@ -130,9 +135,9 @@ class="lnr lnr-arrow-right"></span>By Price<span class="number">({{product_count
     {% if tags %}
     <div class="row" style="margin-top:0px;padding-top:30px;padding-left:15px">
         {% for tag in tags %}
-        <span class="btn" style="color:white;margin-right:5px;width:100px;border-radius:6%;background:#828bb3;">{{tag}}
-            <a href="" style="float:right;color:white" class="close-buttons" id="{{tag}}">X</a>
-        </span>
+        <span class="btn" style="color:white;margin-right:10px;border-radius:6%;background:#828bb3;">{{tag}}
+    <a href="" style="float:right;color:white" class="close-buttons" id="{{tag}}">&nbsp;&nbsp;X</a>
+</span>
         {% endfor %}
         <span class="btn" style="color:white;margin-right:5px;width:100px;border-radius:6%;background:#828bb3;">
     <a href="" style="color:white" id="clear-all-btn">Clear All</a>
@@ -249,7 +254,6 @@ $('#call_sub_btn').click(function(event){
 })
 function call_url_general(tag, value)
 {
-    console.log(window.location.href)
     count=0
     new_url = ''
     old_url = window.location.href.split('&&')
@@ -272,6 +276,95 @@ function call_url_general(tag, value)
         window.location.href = window.location.href+'&&'+tag+'='+value
     }
 }
+
+function call_url_price_both(tag1,tag2, value1, value2)
+{
+
+flag1=false
+    flag2=false
+    console.log(window.location.href)
+    console.log(tag1)
+    console.log(tag2)
+    console.log(value1)
+    console.log(value2)
+    splits = window.location.href.split('&&')
+    for(i=0;i<splits.length;i++)
+    {
+        value = splits[i].split('=')
+        if(value[0] == 'price_lte')
+        {
+            flag1=true
+        }
+        if(value[0] == 'price_gte')
+        {
+            flag2=true
+        }
+    }
+    if(flag1 == true && flag2==false)
+    {
+        splits = window.location.href.split('&&')
+        for(i=0;i<splits.length;i++)
+        {
+            value = splits[i].split('=')
+            if(value[0] == 'price_lte')
+            {
+                value[1]=value1
+                value = value.join('=')
+                splits[i] = value
+            }
+        }
+        url = splits.join('&&')
+        url = url+'&&price_gte='+value2
+        window.location.href = url
+    }
+    if(flag1 == false && flag2 == true)
+    {
+
+        splits = window.location.href.split('&&')
+        for(i=0;i<splits.length;i++)
+        {
+            value = splits[i].split('=')
+            if(value[0] == 'price_gte')
+            {
+                value[1]=value1
+                value = value.join('=')
+                splits[i] = value
+            }
+        }
+        url = splits.join('&&')
+        url = url+'&&price_lte='+value2
+        window.location.href = url
+    }
+    if(flag1 == true && flag2 == true)
+    {
+        splits = window.location.href.split('&&')
+        for(i=0;i<splits.length;i++)
+        {
+            value = splits[i].split('=')
+            if(value[0] == 'price_gte')
+            {
+                value[1] = value2
+                value = value.join('=')
+                splits[i] = value
+            }
+            if(value[0] == 'price_lte')
+            {
+                value[1] = value1
+                value = value.join('=')
+                splits[i] = value
+            }
+        }
+        url = splits.join('&&')
+
+    }
+    if(flag1 == false && flag2 == false)
+    {
+        window.location.href = window.location.href+'&&price_lte='+value1+'&&price_gte='+value2
+    }
+
+
+}
+
 function call_url_for_brand(brand_name)
 {
     console.log(brand_name)

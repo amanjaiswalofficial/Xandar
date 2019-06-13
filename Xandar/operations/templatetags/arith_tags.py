@@ -21,9 +21,9 @@ def count_category(category):
 @register.simple_tag
 def count_sub_category(sub_category):
     try:
-        count_cat = Product.objects.filter(sub_category=sub_category).count()
+        count_cat = sub_category.product_set.all().count()
         return count_cat
-    except ProductCategory.DoesNotExist:
+    except Product.DoesNotExist:
         return 0
 
 @register.filter
