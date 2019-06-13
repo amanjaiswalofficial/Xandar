@@ -83,7 +83,7 @@
                     </div>
                     <div class="col-lg-2 col-sm-2" style="float:left">
                        <div class="product_count" style="float:left;width:50%;margin-top:65px">
-                           <select name="qty" id="{{ item.id }}">
+                           <select name="qty" id="{{ item.id }}" class="quantity-dropdown">
                                         {% if item.quantity == 1%}
                                         <option selected>1</option>
                                         <option>2</option>
@@ -219,6 +219,9 @@
 }
     function show(item_id, item_product_id, item_unit_price)
     {
+            console.log(item_id)
+            console.log($('#'+item_id).val())
+            console.log($( "#"+item_id+" option:selected" ).text())
             quantity = $('#'+item_id).val()
             var token = '{{ csrf_token }}'
 	        $.ajax({
@@ -259,8 +262,12 @@ total_price = 0
                 }
             '{% endfor %}'
             $('#total_checkout_price').text('₹'+total_price)
+			},error:function(error)
+			{
+			    console.log(error)
 			}
 			})
+
     }
     function remove_item(item_product_id)
     {

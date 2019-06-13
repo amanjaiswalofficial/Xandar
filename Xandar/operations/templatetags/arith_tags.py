@@ -31,3 +31,7 @@ def count_objs(objects):
     if objects:
         return len(objects)
     return 0
+
+# @register.tag
+# def trim(name):
+#     return name.split(" ")[0]

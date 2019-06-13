@@ -22,7 +22,7 @@
 <h1>{{ banner.title }}</h1>
 <p>{{ banner.description }}</p>
 <div class="add-bag d-flex align-items-center">
-<a class="add-btn" href="{% url 'product_list' %}?category={{ banner.category }}&&sub_category={{ banner.sub_category }}"><span class="lnr lnr-cross"></span></a>
+<a class="add-btn" href="/product/category={{banner.category.category}}&&sub={{banner.sub_category.sub_category}}"><span class="lnr lnr-cross"></span></a>
 <span class="add-text text-uppercase">Know More</span>
 </div>
 </div>

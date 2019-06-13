@@ -2,6 +2,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
+from django.utils.safestring import mark_safe
+
 from Xandar.util import unique_slug_generator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +17,7 @@ def get_extra_field(table, extra_attributes):
     extra_attributes.append(('Other', tuple([(i, i) for i in extra_fields])))
     return extra_attributes
 
+
 def validate_quantity(value):
     if value not in range(1, 4):
         raise ValidationError(
@@ -25,7 +28,7 @@ def validate_quantity(value):
 
 CATEGORY_CHOICES = (
     ('Men', 'Men'),
-    ('Women','Women'),
+    ('Women', 'Women'),
     ('Electronics', 'Electronics'),
 )
 
@@ -71,29 +74,30 @@ class Customer(AbstractUser):
         else:
             return self.first_name
 
+
 class ProductCategory(models.Model):
     category = models.CharField(max_length=50)
     is_active = models.BooleanField(default=True)
-#sabme is_active dalega
 
-    
+    # sabme is_active dalega
+
     def __str__(self):
         return self.category
-    
-    # class Meta:
-    #     verbose_name_plural = 'Product Categories'
+
+    class Meta:
+        verbose_name_plural = 'Product Categories'
+
 
 class ProductSubcategory(models.Model):
     sub_category = models.CharField(max_length=50)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
-
-
     def __str__(self):
         return self.sub_category
-
-
+    
+    class Meta:
+        verbose_name_plural = "SubCategories"
 
 
 class Product(models.Model):
@@ -110,7 +114,6 @@ class Product(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
-
     def __str__(self):
         return self.name
 
@@ -124,6 +127,18 @@ class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, parent_link=True)
     image = models.FileField(upload_to='product_images/', default='product_images/default.jpg')
 
+    def image_tag(self):
+        return mark_safe('<img src="%s" width=100px height=100px />' % (self.image.url))
+
+    image_tag.short_description = "Image"
+    image_tag.allow_tags = True
+
+    def __str__(self):
+        return self.product.name
+    
+    class Meta:
+        verbose_name_plural = "Product Images"
+
 
 class Attribute(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -133,20 +148,28 @@ class Attribute(models.Model):
 
 class Wishlist(models.Model):
     customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
+
     # product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    
+
     def __str__(self):
         return self.product.name
 
     def get_absolute_url(self):
         return reverse('operations:wishlist')
 
+
 class WishlistItems(models.Model):
     wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = 'WishList Item'
+        verbose_name_plural = 'WishList Items'
+
     def __str__(self):
         return self.product.name
+
+
 # -------------PREVIOUS WORK - WEEK ONE---------------#
 class OrderedItems(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -154,7 +177,7 @@ class OrderedItems(models.Model):
     slug = models.SlugField(max_length=250, null=True, blank=True, default="")
     title = models.CharField(max_length=50, blank=False, default="")
     description = models.CharField(max_length=255, default="")
-    price = models.PositiveIntegerField(blank=False,default=0)
+    price = models.PositiveIntegerField(blank=False, default=0)
     quantity = models.PositiveSmallIntegerField(default=0)
     order_date = models.DateTimeField(auto_now_add=True)
 
@@ -188,6 +211,10 @@ class CartItems(models.Model):
     quantity = models.PositiveSmallIntegerField(validators=[validate_quantity, ], choices=choices)
     unit_price = models.DecimalField(max_digits=18, decimal_places=2, verbose_name=_('unit price'))
 
+    class Meta:
+        verbose_name = 'Cart Item'
+        verbose_name_plural = 'Cart Items'
+
     def __str__(self):
         return self.product.name
 
@@ -206,8 +233,8 @@ class Banner(models.Model):
 class TopBanner(models.Model):
     title = models.CharField(max_length=50, blank=True)
     description = models.CharField(max_length=255)
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=20)
-    sub_category = models.CharField(choices=SUB_CATEGORY_CHOICES, max_length=20, blank=True)
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
+    sub_category = models.ForeignKey(ProductSubcategory, on_delete=models.CASCADE)
     image = models.FileField(upload_to='banner_images/', blank=False)
     is_active = models.BooleanField(default=False)
 
@@ -229,17 +256,20 @@ class Review(models.Model):
     posted_date = models.DateTimeField(auto_now_add=True)
     message = models.CharField(max_length=250, default='', blank=False)
 
+
 class Coupons(models.Model):
     name = models.CharField(max_length=30)
     valid_from = models.DateTimeField(auto_now_add=True)
-    valid_till = models.DateTimeField(default=datetime.now()+timedelta(days=30))
+    valid_till = models.DateTimeField(default=datetime.now() + timedelta(days=30))
     discount = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
-        verbose_name = _("Coupons")
+        verbose_name = 'Coupon'
+        verbose_name_plural = 'Coupons'
 
     def __str__(self):
         return self.name
+
 
 # class Coupons(models.Model):
 #     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -252,3 +282,7 @@ class Color(models.Model):
 class ColorDefinition(models.Model):
     color = models.CharField(max_length=10)
     code = models.CharField(max_length=8)
+
+
+
+
