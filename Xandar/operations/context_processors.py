@@ -21,12 +21,13 @@ def categories(request):
 def sub_category(request):
     category = request.session.get("category", None)
     sub_categories = None
-    if category:
-        try:
-            category = ProductCategory.objects.get(category=category)
-            sub_categories = category.productsubcategory_set.all()
-        except ProductCategory.DoesNotExist:
-            sub_category = []
+    # if category:
+    #     try:
+    #         pass
+    #         #category = ProductCategory.objects.get(category=category)
+    #         #sub_categories = category.productsubcategory_set.all()
+    #     except ProductCategory.DoesNotExist:
+    #         sub_category = []
     return {"sub_category": sub_categories}
 
 def price(request):
@@ -37,19 +38,24 @@ def brand(request):
 
 def filter_attributes(request):
     sub_category = request.session.get("sub_category", None)
+    category = request.session.get("category", None)
     attributes = None
     colors = None
 
     if sub_category:
         attribute = set()
         color = set()
+
         try:
+            # category = ProductCategory.objects.get(category=category)
             sub_category = ProductSubcategory.objects.get(sub_category=sub_category)
             products = Product.objects.filter(sub_category=sub_category)
             for product in products:
                 attribute = attribute.union(set([item.value for item in product.attribute_set.all()]))
                 color = color.union(set([item.color for item in product.color_set.all()]))
 
+        except ProductCategory.DoesNotExist:
+            pass
         except ProductSubcategory.DoesNotExist:
             pass
 

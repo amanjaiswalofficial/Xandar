@@ -73,8 +73,7 @@ class CustomerAdmin(UserAdmin):
 
 
 class SubCategoryAdmin(admin.ModelAdmin):
-    list_display = ['sub_category', 'category']
-    list_filter = ['category']
+    list_display = ['sub_category']
 
 
 admin.site.register(Customer, CustomerAdmin)
