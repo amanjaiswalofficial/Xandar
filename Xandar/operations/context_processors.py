@@ -21,14 +21,21 @@ def categories(request):
 def sub_category(request):
     category = request.session.get("category", None)
     sub_categories = None
-    # if category:
-    #     try:
-    #         pass
-    #         #category = ProductCategory.objects.get(category=category)
-    #         #sub_categories = category.productsubcategory_set.all()
-    #     except ProductCategory.DoesNotExist:
-    #         sub_category = []
-    return {"sub_category": sub_categories}
+    sub_categories_all = None
+    if category:
+
+        if category == "All":
+            sub_categories_all = ProductCategory.objects.order_by().distinct()
+
+        else:
+            sub_category = set()
+            try:
+                category = ProductCategory.objects.get(category=category)
+                sub_categories = sub_category.union(set([item.sub_category for item in Product.objects.filter(category=category)]))
+
+            except ProductCategory.DoesNotExist:
+                sub_categories_all = ProductCategory.objects.order_by().distinct()
+    return {"sub_category": sub_categories, "sub_category_all": sub_categories_all}
 
 def price(request):
     return {'product_count': Product.objects.all().count()}
@@ -63,3 +70,4 @@ def filter_attributes(request):
         attributes = attribute
 
     return {"attributes": attributes, "colors": colors }
+    
