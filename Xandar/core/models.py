@@ -90,6 +90,7 @@ class ProductCategory(models.Model):
 
 class ProductSubcategory(models.Model):
     sub_category = models.CharField(max_length=50)
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
