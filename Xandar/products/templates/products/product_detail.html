@@ -81,40 +81,73 @@
 
 
 				</div>
-				<div class="col-lg-5 offset-lg-1">
-					<div class="s_product_text">
-						<h3>{{object.name}}</h3>
-						<h2>₹{{object.price}}</h2>
-						<ul class="list">
-							<!-- Set category a link to go to -->
-							<li><a class="active" href="#"><span>Category&nbsp&nbsp:</span> {{object.category}} </a></li>
-							<!-- Set availability to in or out of stock once done -->
-							<li><a href="#"><span>Availibility:</span> :
-                                {% if object.quantity %}
-                                    In Stock
-                                {% else %}
-                                    Out of Stock
-                                {% endif %}
-                                </a></li>
-						</ul>
-						<p>{{object.description}}</p>
-						<span style="color:blue">The maximum amount allowed per user is 3</span><br>
-						<div class="product_count">
+				<div class="col-lg-5 offset-lg-1" style="margin-top:-4%;">
+   <div class="s_product_text">
+      <h3>{{object.name}}</h3>
+      <h2>₹ &nbsp;{{object.price}}</h2>
+      <ul class="list">
+         <!-- Set category a link to go to -->
+         <li><span>Category&nbsp;&nbsp;&nbsp;:</span>&nbsp;&nbsp; <span style="color:#fd7e14;">{{object.category}}</span></li>
+         <!-- Set availability to in or out of stock once done -->
+         <li><span>Availibility :</span>
+                            {% if object.quantity %}
+                               &nbsp; <span style="color:#fd7e14;">In Stock</span>
+                            {% else %}
+               &nbsp; <span style="color:#fd7e14;">Out of Stock</span>
+                            {% endif %}
+                            </li>
+      </ul>
+      <hr>
+      <div>{{object.description}}</div>
 
-							<label for="qty">Quantity:</label>
-							<input type="text" readonly name="qty" id="sst" maxlength="12" value="1" title="Quantity:">
-							<button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst < 3 ) result.value++;return false;"
-							 class="increase items-count"  type="button"><i style="color:red;" class="lnr lnr-chevron-up"></i></button>
-							<button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 1 ) result.value--;return false;"
-							 class="reduced items-count" type="button"><i style="color:red;"class="lnr lnr-chevron-down"></i></button>
-						</div>
-						<form class="card_area d-flex align-items-center" method="post" action="{% url 'products:product_add' object.id %}">
-                            {% csrf_token %}
-                            <input type="button" class="primary-btn" value="Add To Cart" name="cart-btn" onclick="add_function({{object.id}}, 'cart')">
-                            <button type="button" class="icon_btn" value="Add To Wishlist" name="wishlist-btn" onclick="add_function({{object.id}}, 'wishlist')">
-                                <i class="lnr lnr lnr-heart"></i>
-							</button>
-						</form>
+
+
+
+
+
+      <div>
+                     <div style="">Available Colors:</div>
+                  {% if colors %}
+                  <div>
+                     {% for color in colors %}
+                  <label>
+  <input type="radio" name="color-radio" value="{{color.color}}" checked style="visibility:hidden" class="color-radio-class">
+  <div style="width:25px;height:25px;background:{{color.color}};border:2px solid grey"></div>
+</label>
+                     {% endfor %}
+                     </div>
+                     <br>
+                     <span id="selected-color-text" style="color:#fd7e14;">Selected Color: {{colors.0.color}}</span>
+                  {% endif %}<br>
+
+                     </div>
+
+
+
+
+
+
+
+      <br>
+      <div class="product_count">
+
+         <label for="qty">Quantity:</label>
+         <input type="text" readonly name="qty" id="sst" maxlength="12" value="1" title="Quantity:">
+         <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst < 3 ) result.value++;return false;"
+          class="increase items-count"  type="button"><i style="color:red;" class="lnr lnr-chevron-up"></i></button>
+         <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 1 ) result.value--;return false;"
+          class="reduced items-count" type="button"><i style="color:red;"class="lnr lnr-chevron-down"></i></button>
+      </div>
+      <br>
+      <span style="color:red; font-size:12px;">The maximum amount allowed per user is 3</span><br><br>
+      <form class="card_area d-flex align-items-center" method="post" action="{% url 'products:product_add' object.id %}">
+                        {% csrf_token %}
+                        <input type="button" class="primary-btn" value="Add To Cart" name="cart-btn" onclick="add_function({{object.id}}, 'cart')">
+                        <button title="Add to Wishlist" type="button" class="icon_btn" value="Add To Wishlist" name="wishlist-btn" onclick="add_function({{object.id}}, 'wishlist')">
+                            <i class="lnr lnr lnr-heart"></i>
+         </button>
+      </form>
+
 
 					</div>
 				</div>
@@ -360,7 +393,12 @@
 	</section>-->
 	<!-- End related-product Area -->
 <script src="https://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
+
 <script>
+$('.color-radio-class').click(function()
+{
+   $('#selected-color-text').text('Selected Color: '+$("input[name='color-radio']:checked").val())
+})
 
 $('#profile-tab').click(function()
 {

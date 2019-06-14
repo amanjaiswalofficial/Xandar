@@ -25,10 +25,15 @@ active
 "><a class="nav-link" href="{% url 'index' %}">Home</a></li>
 
 
-
 {% if user.is_authenticated %}
 
-<li class="nav-item submenu dropdown">
+<li class="nav-item submenu dropdown
+{% if 'dashboard' in request.path %}
+active
+{% endif %}
+{% if 'wishlist' in request.path %}
+active
+{% endif %}">
 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
 aria-expanded="false">{{user.first_name }}</a>
 <ul class="dropdown-menu">

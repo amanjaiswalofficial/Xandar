@@ -27,7 +27,7 @@ active
               {% for product in featured_products %}
               {% if product.category.category == object.category %}
               <li class="nav-item" style="width: 285px; margin-left: 15px">
-              <a class="nav-link" href="{% url 'products:product_detail' product.slug %}">{{product.name|truncatechars:31}}</a>
+              <a class="nav-link" href="{% url 'products:product_detail' product.slug %}" >{{product.name|truncatechars:31}}</a>
               </li>
               {% endif %}
              {% endfor %}

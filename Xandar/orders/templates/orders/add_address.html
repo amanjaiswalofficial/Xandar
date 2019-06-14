@@ -24,6 +24,10 @@
             <div class="billing_details">
                 <div class="row">
                     <div class="col-lg-8" style="border: 2px solid; border-radius:5px; padding:30px;">
+                        <div class="checkout_btn_inner align-items-center d-flex" style="margin-top:-28px; margin-left:-28px; font-size:10px;">
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                            <a href="{% url 'orders:delivery_address' %}"><i title="Go Back" style="font-size:24px" class="fa fa-arrow-circle-left"></i></a>&nbsp;&nbsp;&nbsp;
+                         </div>
                         <h3 style="text-align:center;">Add New Address</h3>
 
                         <form class="row contact_form" action="" method="POST">
