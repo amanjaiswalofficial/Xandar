@@ -91,6 +91,7 @@ class ProductDetailView(DetailView):
 			context['images'].append(image)
 		for review in get_dataset(Review, product=context['object']):
 			context['reviews'].append(review)
+		context['colors'] = Color.objects.filter(product=product)
 		if self.request.user.is_authenticated:
 			try:
 				OrderedItems.objects.get(customer=self.request.user, title=context['object'].name)
